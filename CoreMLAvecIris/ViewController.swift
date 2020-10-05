@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreML
 
 class ViewController: UIViewController {
     
@@ -14,17 +15,19 @@ class ViewController: UIViewController {
     @IBOutlet weak var bouton: UIButton!
     @IBOutlet weak var holderVue: UIView!
     @IBOutlet weak var irisImageVue: UIImageView!
+    
     @IBOutlet weak var longueurSepaleLbl: UILabel!
     @IBOutlet weak var largeurSepaleLbl: UILabel!
     @IBOutlet weak var longueurPetaleLbl: UILabel!
     @IBOutlet weak var largeurPetaleLbl: UILabel!
+    
     @IBOutlet weak var longueurSepaleSlider: UISlider!
     @IBOutlet weak var largeurSepaleSlider: UISlider!
     @IBOutlet weak var longueurPetaleSlider: UISlider!
     @IBOutlet weak var largeurPetaleSlider: UISlider!
     
     var imageVisible = false
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         resultatLbl.text = ""
@@ -61,13 +64,14 @@ class ViewController: UIViewController {
     
     @IBAction func boutonAction(_ sender: Any) {
         if !imageVisible {
-            let model = mon_iris_model()
-            let input = mon_iris_modelInput(
-                sepal_length__cm_: Double(longueurSepaleSlider.value),
-                sepal_width__cm_: Double(largeurSepaleSlider.value),
-                petal_length__cm_: Double(longueurPetaleSlider.value),
-                petal_width__cm_: Double(largeurPetaleSlider.value))
             do {
+                let config = MLModelConfiguration()
+                let model = try mon_iris_model(configuration: config)
+                let input = mon_iris_modelInput(
+                    sepal_length__cm_: Double(longueurSepaleSlider.value),
+                    sepal_width__cm_: Double(largeurSepaleSlider.value),
+                    petal_length__cm_: Double(longueurPetaleSlider.value),
+                    petal_width__cm_: Double(largeurPetaleSlider.value))
                 let prediction = try model.prediction(input: input)
                 let resultatInt = Int(prediction.espece)
                 let image = UIImage(named: String(resultatInt))
